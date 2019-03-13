@@ -1,0 +1,164 @@
+\documentclass{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{amsmath, amssymb, mathrsfs}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{stmaryrd}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+
+\title{Machine Learning from Data Assignment 8}
+\author{Greg Stewart}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\subsection*{Exercise 4.3}
+
+\textit{Deterministic noise depends on $H$, as some models approximate $f$ better than others.}
+
+\begin{enumerate}[(a)]
+  \item \textit{Assume $H$ fixed and the complexity of $f$ increased. Will deterministic noise
+    in general go up or down? Is there a higher or lower tendency to overfit?}
+
+    Deterministic noise will go up as the final hypothesis from $H$ is able to model less
+    of the target function $f$. Likewise, the tendency to overfit increases.
+    
+  \item \textit{Assume $f$ fixed and complexity of $H$ increased. Will deterministic noise go up
+    or down? Is there a higher or lower tendency to overfit?}
+
+    Decreasing the complexity of $H$ will also increase deterministic noise as the simpler
+    hypothesis cannot model $f$ as well. However, overfitting will decrease.
+
+\end{enumerate}
+
+\subsection*{Exercise 4.5}
+
+\textit{A more general soft constraint is the Tikhonov regularization constraint 
+$$\vec{w}^T\vec{\Gamma}^T\vec{\Gamma}\vec{w} \leq C$$ which captures the relationship between the
+$w_i$---the matrix $\Gamma$ is the Tikhonov regularizer.}
+
+\begin{enumerate}[(a)]
+  \item \textit{What should $\Gamma$ be to obtain the constraint
+    $\sum_{q=0}^Q w_q^2 \leq C$?}
+
+    $\vec{\Gamma} = \vec{I}$, the identity matrix, to get this constraint.
+
+  \item \textit{What should $\Gamma$ be to obtain the constraint
+    $(\sum_{q=0}^Q w_q)^2 \leq C$.}
+
+    $\Gamma$ can simply be a row of ones in this case.
+    
+
+\end{enumerate}
+
+\subsection*{Exercise 4.6}
+
+\textit{We've seen both hard-order constraint and soft-order constraint. Which do you expect to
+be more useful for binary classification using the perceptron model?}
+
+\smallskip
+
+The soft order constraint holds the potential to obtain a good fit for classification with the
+additional benefit of lower out-of-sample error, so I would expect it to be more useful.
+
+\subsection*{Exercise 4.7}
+
+\textit{Fix $g^-$, learned from $D_{train}$, and define $\sigma_{val}^2 = Var_{D_{val}}[E_{val}(g^-)
+].$ We consider how $\sigma_{val}^2$ depends on $K$. Let 
+$$\sigma^2(g^-) = Var_{\vec{x}}[e(g^-(\vec{x}), y)]$$ be the pointwise variance in the out-of-
+sample error of $g^-$.}
+
+\begin{enumerate}[(a)]
+  \item \textit{Show $\sigma_{val}^2 = \frac{1}{K}\sigma^2(g^-)$.}
+
+    $E_{val}(g^-)$ is defined as the sum over $D_{val}$ of $e(g^-(\vec{x}),y)$. There are $K$ 
+    points in the validation data set, and for each $\vec{x}$ we have the variance given in the
+    problem description. Thus for the validation set we have
+
+    \begin{align*}
+      \sigma_{val}&= \frac{1}{K}Var_{\vec{x}}[e(g^-(\vec{x}),y)]\qquad\text{for } x \in D_{val}\\
+      &= \frac{1}{K}\sigma^2(g^-)
+    \end{align*}
+
+  \item \textit{In classification problem, where $e(g^-(\vec{x}),y) = \llbracket g^-(\vec{x}) \neq y\rrbracket$,
+    express $\sigma_{val}^2$ in terms of $\mathbb{P}[g^-(\vec{x})\neq y]$.}
+
+    Let $\mathbb{P}[g^-(\vec{x}) \neq y] = p$ From the definition shown in (a), we have in this
+    case that$$\sigma_{val}^2 = \frac{1}{K}Var_\vec{x}\llbracket g^-(\vec{x} \neq y \rrbracket.$$
+
+    To calculate this we need $\mathbb{E}[E_{val}]$ and $\mathbb{E}[E_{val}^2]$.
+
+    \begin{align*}
+      \mathbb{E}[E_{val}] &= \mathbb{E}\left[\frac{1}{K} \sum_{k = 0}^K \llbracket g^-(\vec{x}_k) \neq y_k \rrbracket \right] \\
+      &= \mathbb{P}[g^-(\vec{x}) \neq y] \\
+      &= p
+    \end{align*}
+
+    \begin{align*}
+      \mathbb{E}[E_{val}^2] &= \mathbb{E}\left[\frac{1}{K} \sum_{k = 0}^K \llbracket g^-(\vec{x}_k) \neq y_k \rrbracket^2 \right] \\
+      &= p
+    \end{align*}
+
+    because the pointwise error is either 0 or 1, both of which are unchanged when squared. So,
+    for variance, we get
+
+    \begin{align*}
+      \sigma_{val}^2 &= \frac{1}{K}\left(\mathbb{E}[E_{val}^2] - \mathbb{E}[E_{val}]^2 \right)\\
+      &= \frac{1}{K}\left( p - p^2 \right) \\
+      &= \frac{1}{K}(\mathbb{P}[g^-(\vec{x}) \neq y] - \mathbb{P}[g^-(\vec{x}) \neq y]^2)
+    \end{align*}
+
+
+
+  \item \textit{Show that for any $g^-$ in a classification problem, $\sigma_{val}^2\leq
+    \frac{1}{4K}.$}
+
+    The maximum possible value for $\mathbb{P}[g^-(\vec{x}) \neq y]$ is $\frac{1}{2}$. Plugging
+    in this value to the result in (b) gets us
+
+    $$\sigma_{val}^2 = \frac{1}{K}\left[\frac{1}{2} - \left(\frac{1}{2}\right)^2\right] = \frac{1}{4K}$$
+
+    As this is an upper bound, it means we must have that
+
+    $$\sigma_{val}^2 \leq \frac{1}{4K}.$$
+
+  \item \textit{Is there a uniform upper bound for $Var[E_{val}(g^-)]$  similar to (c) in the
+    case of regression with squared error $e(g^-(\vec{x}), y) = (g^-(\vec{x})-y)^2$?}
+
+    No, no upper bound exists for squared error.
+
+  \item \textit{For regression with squared error, if we train using fewer points (smaller 
+    $N-K$) to get $g^-$, do you expect $\sigma^2(g^-)$ to be higher or lower?}
+
+    Training with fewer points, I'd expect $\sigma^2(g-)$ to be \textbf{higher}.
+
+  \item \textit{Conclude that increasding the size of the validation set can result in a better
+    or worse estimate of $E_{out}$.}
+
+    For the most part, increasing the size of the validation set only makes the estimate for 
+    $E_{out}$ worse---there is no upper bound for squared error, which is by and large a more
+    useful metric. Thus error will likely increase as the validation set is increased in size and
+    the training set decreases in size.
+
+\end{enumerate}
+
+\subsection*{Exercise 4.8}
+
+\textit{Is $E_m$ an unbiased estimate for the out of sample error $E_{out}(g^-_m)$?}
+
+\smallskip
+
+Yes, it's unbiased because no $g_m^-$ has been picked yet.
+
+
+
+
+
+\end{document}

@@ -1,0 +1,233 @@
+\documentclass{article}
+\usepackage[margin=1.0in]{geometry}
+\usepackage{amsmath, amssymb, mathrsfs}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{tikz}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+
+\title{Machine Learning from Data Assignment 4}
+\author{Greg Stewart}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\subsection*{Exercise 2.4}
+
+\textit{Consider the input space $X = \{1\}\times\mathbb{R}^d$. Show that the VC dimension
+of the perceptron, with $d+1$ parameters, is exactly $d+1$ by showing that it is at least $d+1$ 
+and at most $d+1$ as follows.}
+
+\begin{enumerate}[(a)]
+  \item \textit{To show that $d_{VC} \geq d+1$, find $d+1$ points in $X$ that the perceptron can
+    shatter.}
+
+    Let there be a set of $d+1$ points in $\mathbb{R}^d$ that are shattered by the perceptron, e.g.
+
+    $$X =
+      \begin{pmatrix}
+        x_1^T \\
+        x_2^T \\
+        \vdots \\
+        x_{d+1}^T
+      \end{pmatrix}
+      =
+      \begin{pmatrix}
+        1 & 0 & 0 & \cdots & 0 \\
+        1 & 1 & 0 & \cdots & 0 \\
+        1 & 0 & 1 & \cdots & 0 \\
+        \vdots & \vdots & \vdots & \ddots & \vdots \\
+        1 & 0 & 0 & \cdots & 1
+      \end{pmatrix}
+    $$
+
+    We need to find a 
+
+    $$ y =
+      \begin{pmatrix}
+        y_1 \\ y_2 \\ \vdots \\ y_{d+1}
+      \end{pmatrix}
+    $$
+
+    where $y_i \in \{-1, +1\}$ that satisfies $\text{sign}(Xw) = y$, where $w$ is some set of weights.
+    This can easily be accomplished with 
+
+    $$ w = X^{-1}y$$
+
+    because $X$ is invertible. Therefore, $d_{VC} \geq d+1$.
+    
+  \item \textit{To show $d_{VC} \leq d+1$, show that no set of $d+2$ points in $X$ can be shattered
+    by the perceptron}. 
+
+    Given a set of $d+2$ points, $\{x_1, x_2, \dots, x_{d+2}\}$, we have more vectors than dimensions,
+    so not all of them can be linearly independent. Therefore, for some point $x_i$ in the set, we can
+    write it as a linear combination:
+
+    $$ x_i = \sum_{j=1, j\neq i}^{d+2} \alpha_jx_j.$$
+
+    It is straightforward to create a dichotomy that can't actually be generated:
+
+    $$y_j = \begin{cases} \text{sign}(\alpha_j) & j \neq i \\ -1 & j = i \end{cases} $$
+
+    We can assume the labels are corrext as $\text{sign}(\alpha_j) = \text{sign}(w^Tx_j)$. Then
+    $\alpha_jw^Tx_j > 0$. So for the $i^{th}$ point, we have
+
+    $$w^T x_i = \sum_{j\neq i} \alpha_jw^Tx_j > 0$$
+
+    so $y_i = +1$ which contradicts the previously constructed dichotomy. Therefore
+    
+    $$d_{VC} \leq d+1$$.
+
+    Since we have both $d_{VC} \geq d+1$ and $d_{VC} \leq d+1$, it must be the case that
+
+    $$d_{VC} = d+1.$$
+
+\end{enumerate}
+
+
+
+\subsection*{Problem 2.3}
+
+\textit{Compute the maximum number of dichotomies $m_{H}(N)$ for these learning models, and
+consequently compute $d_{VC}$.}
+
+\begin{enumerate}[(a)]
+  \item \textit{Positive or negative ray: $H$ contains the functions which are +1 on $[a, \infty)$
+    (for some $a$) together with those that are +1 on $(-\infty, a]$ (for some $a$).}
+
+    $$m_H(N) = 2N$$
+
+    The pattern beging to become obvious at $N = 3$. The VC dimension is $$d_{VC} = 2.$$
+
+  \item \textit{Positive or negative interval: $H$ contains the functions which are +1 on an
+    interval $[a,b]$ and -1 elsewhere or -1 on an interval $[a,b]$ and +1 elsewhere.}
+
+      
+
+  \item \textit{Two concentric spheres in $\mathbb{R}^4: H$ contains the functions which are +1
+    for $a \leq \sqrt{x_1^2 + \cdots + x_d^2} \leq b$.}
+
+    As these are spheres, the middle term of the equality can be thought of as a radius, reducing
+    the problem to 1-dimensional positive intervals, i.e. $$a \leq r \leq b.$$ This means the growth
+    function is
+
+    $$m_H(N) = \begin{pmatrix} N+1 \\ 2 \end{pmatrix} + 1 = \frac{N^2}{2} + \frac{N}{2} + 1.$$
+
+    Thus the VC dimension is $$d_{VC} = 2$$
+
+\end{enumerate}
+
+
+
+\subsection*{Problem 2.8}
+
+\textit{Which of the following are possible growth functions $m_H(N)$ for some hypothesis set:}
+
+\smallskip
+
+$1+N$: Yes, this is possible.
+
+\smallskip
+
+$1+N+\frac{N(N-1)}{2}$: Yes, this is possible.
+
+\smallskip
+
+$2^N$: Yes, this is possible, and is in fact the upper bound.
+
+\smallskip
+
+$2^{\floor{\sqrt{N}}}$: No, this is not possible because it is neither polynomial nor $2^N$.
+
+\smallskip
+
+$2^{\floor{N/2}}$: No, not possible again because it is neither polynomial nor $2^N$.
+
+\smallskip
+
+$1+N+\frac{N(N-1)(N-2)}{6}$: Yes, this is possible.
+
+
+
+\subsection*{Problem 2.10}
+
+\textit{Show that $m_H(2N) \leq m_H(N)^2$, and hence obtain a generalization bound which 
+only involves $m_H(N)$.}
+
+  In the worst case, where $m_H(N) = 2^N$, we have
+
+  \begin{align*}
+    m_H(2N) = 2^{2N} &\leq (2^N)^2 = 2^{2N}
+  \end{align*}
+  
+  Now, if the growth function is not exponential, it must be a finite polynomial, so we can write it
+  as
+
+  $$m_H(N) = a_1N^{d_{VC}} + a_2N^{d_{VC}-1} + \cdots + a_{d_{VC}}N + b$$
+
+  Then for $m_H(2N)$ we have
+
+  $$m_H(N) = a_1 2^{d_{VC}} N^{d_{VC}} + a_2 2^{d_{VC}-1} N^{d_{VC}-1} + \cdots + 2 a_{d_{VC}}N + b$$
+
+  And for $m_H(N)^2$ we have
+
+  \begin{align*}
+    m_H(N)^2 &= (a_1N^{d_{VC}} + a_2N^{d_{VC}-1} + \cdots + a_{d_{VC}}N + b)(a_1N^{d_{VC}} + a_2N^{d_{VC}-1} + \cdots + a_{d_{VC}}N + b) \\
+    &= a_1^2N^{2d_{VC}} + a_1a_2N^{d_{VC}(d_{VC}-1)} + \cdots + a_{d_{VC}}^2N^2 + b^2 \\
+  \end{align*}
+
+  The largest term in $m_H(N)^2$ (and many more terms after it) is larger than than the largest term
+  in $m_H(2N)$. i.e.
+
+  $$a_1 2^{d_{VC}} N^{d_{VC}} + a_2 2^{d_{VC}-1} N^{d_{VC}-1} + \cdots + 2 a_{d_{VC}}N + b \leq a_1^2N^{2d_{VC}} + a_1a_2N^{d_{VC}(d_{VC}-1)} + \cdots + a_{d_{VC}}^2N^2 + b^2$$
+
+  Therefore we know that $$m_H(2N) \leq m_H(N)^2.$$
+
+  With this conclusion we can restate the generalization bound and replace $m_H(2N)$ with $m_H(N)^2$.
+
+  $$E_{out}(g) \leq E_{in}(g) + \sqrt{\frac{8}{N}\ln\frac{4m_H(N)^2}{\delta}}$$
+
+\subsection*{Problem 2.12}
+
+\textit{For an $H$ with $d_{VC} = 10$, what sample size do you need (as prescribed by
+generalization bound) to have a 95\% confidence that your generalization error is at most 0.05?}
+
+We use formula derived from the generalization bound to obtain this iteratively:
+
+$$N \geq \frac{8}{\epsilon^2}\ln\frac{4((2N)^{d_{VC}} + 1)}{\delta}$$
+
+Using $\epsilon = 0.05, \delta = 0.05$, and the given VC dimension, let's start with $N=1000$.
+
+\begin{align*}
+  N=1000 &\implies N=62668 \\
+  N=62668 &\implies N=89150 \\
+  N=89150 &\implies N=91406 \\
+  N=91406 &\implies N=91566 \\
+  N=91566 &\implies N=91577 \\
+  N=91577 &\implies N=91578
+\end{align*}
+
+So let's settle on using a sample size of $N\approx 91600$ to get the desired outcome.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
